@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Elevator Call</title>
+</head>
+<body class="flex flex-col items-center gap-4 p-4">
+  <button id="callBtn">Elevator を呼ぶ</button>
+  <pre id="result"></pre>
+
+  <script>
+    const API_URL = "https://your-domain-or-ip/call";  // 80/443 にリバプロ済み想定
+    const API_KEY = "supersecret";
+
+    document.getElementById("callBtn").onclick = async () => {
+      try {
+        const res = await fetch(API_URL, {
+          method: "POST",
+          headers: { "X-API-KEY": API_KEY }
+        });
+        const data = await res.json();
+        document.getElementById("result").textContent =
+          JSON.stringify(data, null, 2);
+      } catch (err) {
+        document.getElementById("result").textContent = err;
+      }
+    };
+  </script>
+</body>
+</html>
