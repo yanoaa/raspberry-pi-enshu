@@ -39,10 +39,7 @@ def verify_key():
     # １）OPTIONS は認証不要
     if request.method == "OPTIONS":
         return
-    # ２）他に認証除外したいエンドポイントがあれば追加
-    if request.endpoint == "health":
-        return
-    # ３）それ以外は X-API-KEY をチェック
+    # 2）それ以外は X-API-KEY をチェック
     if request.headers.get("X-API-KEY") != API_KEY:
         abort(401)
 
@@ -53,7 +50,7 @@ PI_ELEVATOR_IP = "172.20.10.14"
 PI_ELEVATOR_PORT = 5001
 PI_ELEVATOR_URL = f"http://{PI_ELEVATOR_IP}:{PI_ELEVATOR_PORT}/press"
 
-@app.route('/call', methods=['POST'])
+@app.route('/call', methods=['POST', 'OPTIONS'])
 def handle_call():
     """
     Pi-Roomからの呼び出しを受け付け、Pi-Elevatorに処理を依頼するエンドポイント
