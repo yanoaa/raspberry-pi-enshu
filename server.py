@@ -4,6 +4,8 @@ from flask import Flask, jsonify
 import requests
 import logging
 
+from pyngrok import ngrok
+
 import os
 from flask_cors import CORS
 from dotenv import load_dotenv
@@ -11,6 +13,14 @@ load_dotenv()
 
 # ロギング設定
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
+# --- ここだけ追加・修正 ---
+NGROK_TOKEN = "2wuVwoWrfiid4G8sajbTD2bYWwg_6kz4pxcFixLp7GcLgR1EU"
+ngrok.set_auth_token(NGROK_TOKEN)
+
+# 既存 ngrok プロセスを強制終了
+ngrok.kill()
+# --- ここまで ---
 
 # Flaskアプリケーションのインスタンスを作成
 app = Flask(__name__)
@@ -69,5 +79,9 @@ def handle_call():
         }), 500 # サーバー内部エラーを示す500を返す
 
 if __name__ == '__main__':
+
+    public_url = ngrok.connect(5000, bind_tls=True)
+    print(f" * ngrok tunnel {public_url} -> http://127.0.0.1:5000")
+
     # サーバーを起動 (LAN内のすべてのIPアドレスからアクセス可能にする)
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=True, use_reloader=False)
