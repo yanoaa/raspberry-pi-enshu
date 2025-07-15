@@ -1,6 +1,6 @@
 # server.py
 # 必要なライブラリをインポート
-from flask import Flask, jsonify, abort
+from flask import Flask, jsonify, abort, request
 import requests
 import logging
 
@@ -37,13 +37,13 @@ API_KEY = os.getenv("API_KEY", "changeme")
 @app.before_request
 def verify_key():
     # １）OPTIONS は認証不要
-    if requests.method == "OPTIONS":
+    if request.method == "OPTIONS":
         return
     # ２）他に認証除外したいエンドポイントがあれば追加
-    if requests.endpoint == "health":
+    if request.endpoint == "health":
         return
     # ３）それ以外は X-API-KEY をチェック
-    if requests.headers.get("X-API-KEY") != API_KEY:
+    if request.headers.get("X-API-KEY") != API_KEY:
         abort(401)
 
 
