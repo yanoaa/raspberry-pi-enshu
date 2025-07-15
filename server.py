@@ -1,6 +1,6 @@
 # server.py
 # 必要なライブラリをインポート
-from flask import Flask, jsonify
+from flask import Flask, jsonify, abort
 import requests
 import logging
 
@@ -24,18 +24,26 @@ ngrok.kill()
 
 # Flaskアプリケーションのインスタンスを作成
 app = Flask(__name__)
+# プリフライトで必要なメソッド＆ヘッダを許可
+CORS(
+    app,
+    origins=os.getenv("ALLOWED_ORIGINS", "*"),
+    methods=["GET", "POST", "OPTIONS"],
+    allow_headers=["X-API-KEY", "Content-Type"]
+)
 
-CORS(app, origins=os.getenv("ALLOWED_ORIGINS", "*"))
 API_KEY = os.getenv("API_KEY", "changeme")
 
-
-# 認証チェックを追加
-from flask import request, abort
 @app.before_request
 def verify_key():
-    if request.endpoint == "health":  # 死活監視用は除外
+    # １）OPTIONS は認証不要
+    if requests.method == "OPTIONS":
         return
-    if request.headers.get("X-API-KEY") != API_KEY:
+    # ２）他に認証除外したいエンドポイントがあれば追加
+    if requests.endpoint == "health":
+        return
+    # ３）それ以外は X-API-KEY をチェック
+    if requests.headers.get("X-API-KEY") != API_KEY:
         abort(401)
 
 
