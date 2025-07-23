@@ -6,6 +6,7 @@ from pyngrok import ngrok
 import os
 import logging
 from dotenv import load_dotenv
+from flask import Response
 
 # 環境変数の読み込み
 load_dotenv()
@@ -41,7 +42,7 @@ if NGROK_TOKEN:
 @app.before_request
 def verify_key():
     if request.method == "OPTIONS":
-        return
+        return Response(status=200)
     if request.headers.get("X-API-KEY") != API_KEY:
         abort(401)
 
