@@ -30,7 +30,7 @@ CORS(
 API_KEY = os.getenv("API_KEY", "changeme")
 
 # グローバル変数
-current_floor = None
+current_floor = 1
 
 # ngrokトークン設定
 NGROK_TOKEN = os.getenv("NGROK_TOKEN", "")
@@ -73,6 +73,7 @@ def handle_press_request():
     if current_floor != 5:
         logging.info(f"現在の階数は{current_floor}階です。Pi-Elevatorに押下指示を送信します。")
         socketio.emit('press_button')
+        socketio.emit('new_floor', {'floor': current_floor})
     else:
         logging.info("5階のため、押下指示は送信しません。")
 
