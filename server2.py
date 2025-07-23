@@ -75,6 +75,24 @@ def handle_press_request():
     else:
         logging.info("5階のため、押下指示は送信しません。")
 
+@app.route("/api/request_press", methods=["POST", "OPTIONS"])
+def api_request_press():
+    global current_floor
+    logging.info("[API] 外部からのボタン押下リクエストを受信しました。")
+
+    if current_floor is None:
+        logging.warning("[API] 階数情報がまだありません。")
+        return {"status": "error", "message": "階数情報が未設定です。"}, 400
+
+    if current_floor != 5:
+        logging.info(f"[API] 現在の階数は{current_floor}階です。press_button をブロードキャストします。")
+        socketio.emit('press_button')
+        return {"status": "success", "message": "押下指示を送信しました。"}, 200
+    else:
+        logging.info("[API] 5階のため、押下指示は送信しません。")
+        return {"status": "skipped", "message": "5階なので押下処理をスキップしました。"}, 200
+
+
 # --- メイン ---
 if __name__ == '__main__':
     # ngrokトンネルを開く
